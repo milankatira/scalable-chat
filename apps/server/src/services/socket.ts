@@ -24,6 +24,7 @@ class SocketService {
         allowedHeaders: ["*"],
       },
     });
+    sub.subscribe("MESSAGES");
   }
 
   public initListeners() {
@@ -36,6 +37,12 @@ class SocketService {
         console.log("new message received", message);
         await pub.publish("MESSAGES", JSON.stringify(message));
       });
+    });
+
+    sub.on("message", (channel, message) => {
+      if (channel == "MESSAGES") {
+        this.io.emit("message", message);
+      }
     });
   }
 
