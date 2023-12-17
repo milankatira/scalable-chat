@@ -1,5 +1,6 @@
 import Redis from "ioredis";
 import { Server } from "socket.io";
+import { producerMessage } from "./kafka";
 
 const pub = new Redis({
   host: "redis-123108de-scalable-chat-milan.a.aivencloud.com",
@@ -39,9 +40,11 @@ class SocketService {
       });
     });
 
-    sub.on("message", (channel, message) => {
+    sub.on("message", async (channel, message) => {
       if (channel == "MESSAGES") {
         this.io.emit("message", message);
+        await producerMessage(message);
+        console.log("message produced to kafka Broker")
       }
     });
   }
